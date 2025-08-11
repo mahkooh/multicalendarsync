@@ -1,0 +1,192 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+    "id": "880d5f6d-d20c-4ef9-a76f-b02a93c63202",
+    "manifestVersion": "1.17",
+    "version": "1.0.0",
+    "name": {
+        "short": "MultiCalendar",
+        "full": "MultiCalendar Sync - Calendar Synchronization Add-in"
+    },
+    "description": {
+        "short": "Synchronize busy time across multiple calendars",
+        "full": "Keep your availability consistent across all company calendars by automatically creating busy blocks when you have appointments in other calendars."
+    },
+    "developer": {
+        "name": "Your Organization",
+        "websiteUrl": "https://mahkooh.github.io/multicalendarsync",
+        "privacyUrl": "https://mahkooh.github.io/multicalendarsync/privacy.html",
+        "termsOfUseUrl": "https://mahkooh.github.io/multicalendarsync/terms.html"
+    },
+    "icons": {
+        "outline": "assets/outline.png",
+        "color": "assets/color.png"
+    },
+    "accentColor": "#230201",
+    "localizationInfo": {
+        "defaultLanguageTag": "en-us",
+        "additionalLanguages": []
+    },
+    "authorization": {
+        "permissions": {
+            "resourceSpecific": [
+                {
+                    "name": "MailboxItem.Read.User",
+                    "type": "Delegated"
+                },
+                {
+                    "name": "MailboxItem.ReadWrite.User",
+                    "type": "Delegated"
+                },
+                {
+                    "name": "Calendars.Read.Shared",
+                    "type": "Delegated"
+                },
+                {
+                    "name": "Calendars.ReadWrite.Shared",
+                    "type": "Delegated"
+                }
+            ]
+        }
+    },
+    "validDomains": [
+        "mahkooh.github.io"
+    ],
+    "extensions": [
+        {
+            "requirements": {
+                "scopes": [
+                    "mail"
+                ],
+                "capabilities": [
+                    {
+                        "name": "Mailbox",
+                        "minVersion": "1.3"
+                    }
+                ]
+            },
+            "runtimes": [
+                {
+                    "requirements": {
+                        "capabilities": [
+                            {
+                                "name": "Mailbox",
+                                "minVersion": "1.3"
+                            }
+                        ]
+                    },
+                    "id": "TaskPaneRuntime",
+                    "type": "general",
+                    "code": {
+                        "page": "https://mahkooh.github.io/multicalendarsync/taskpane.html"
+                    },
+                    "lifetime": "short",
+                    "actions": [
+                        {
+                            "id": "TaskPaneRuntimeShow",
+                            "type": "openPage",
+                            "pinnable": false,
+                            "view": "dashboard"
+                        }
+                    ]
+                },
+                {
+                    "id": "CommandsRuntime",
+                    "type": "general",
+                    "code": {
+                        "page": "https://mahkooh.github.io/multicalendarsync/commands.html",
+                        "script": "https://mahkooh.github.io/multicalendarsync/commands.js"
+                    },
+                    "lifetime": "short",
+                    "actions": [
+                        {
+                            "id": "action",
+                            "type": "executeFunction"
+                        }
+                    ]
+                }
+            ],
+            "ribbons": [
+                {
+                    "contexts": [
+                        "mailRead"
+                    ],
+                    "tabs": [
+                        {
+                            "builtInTabId": "TabDefault",
+                            "groups": [
+                                {
+                                    "id": "msgReadGroup",
+                                    "label": "Contoso Add-in",
+                                    "icons": [
+                                        {
+                                            "size": 16,
+                                            "url": "https://localhost:3000/assets/icon-16.png"
+                                        },
+                                        {
+                                            "size": 32,
+                                            "url": "https://localhost:3000/assets/icon-32.png"
+                                        },
+                                        {
+                                            "size": 80,
+                                            "url": "https://localhost:3000/assets/icon-80.png"
+                                        }
+                                    ],
+                                    "controls": [
+                                        {
+                                            "id": "msgReadOpenPaneButton",
+                                            "type": "button",
+                                            "label": "Show Task Pane",
+                                            "icons": [
+                                                {
+                                                    "size": 16,
+                                                    "url": "https://localhost:3000/assets/icon-16.png"
+                                                },
+                                                {
+                                                    "size": 32,
+                                                    "url": "https://localhost:3000/assets/icon-32.png"
+                                                },
+                                                {
+                                                    "size": 80,
+                                                    "url": "https://localhost:3000/assets/icon-80.png"
+                                                }
+                                            ],
+                                            "supertip": {
+                                                "title": "Show Task Pane",
+                                                "description": "Opens a pane displaying all available properties."
+                                            },
+                                            "actionId": "TaskPaneRuntimeShow"
+                                        },
+                                        {
+                                            "id": "ActionButton",
+                                            "type": "button",
+                                            "label": "Perform an action",
+                                            "icons": [
+                                                {
+                                                    "size": 16,
+                                                    "url": "https://localhost:3000/assets/icon-16.png"
+                                                },
+                                                {
+                                                    "size": 32,
+                                                    "url": "https://localhost:3000/assets/icon-32.png"
+                                                },
+                                                {
+                                                    "size": 80,
+                                                    "url": "https://localhost:3000/assets/icon-80.png"
+                                                }
+                                            ],
+                                            "supertip": {
+                                                "title": "Perform an action",
+                                                "description": "Perform an action when clicked."
+                                            },
+                                            "actionId": "action"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
