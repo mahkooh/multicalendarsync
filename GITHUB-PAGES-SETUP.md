@@ -21,7 +21,7 @@ Your code has been successfully pushed to GitHub! Now follow these steps to enab
 ### 3. Test the Add-in
 Once GitHub Pages is active, test these URLs:
 - Main page: `https://mahkooh.github.io/multicalendarsync/dist/taskpane.html`
-- Manifest: `https://mahkooh.github.io/multicalendarsync/dist/manifest.json`
+- Manifest: `https://mahkooh.github.io/multicalendarsync/dist/manifest.xml`
 
 ## Deploy to Microsoft 365 Admin Center
 
@@ -32,7 +32,7 @@ Once GitHub Pages is active, test these URLs:
 
 ### 2. Upload Manifest
 1. Select **Upload manifest file**
-2. Download the manifest from: `https://mahkooh.github.io/multicalendarsync/dist/manifest.json`
+2. Download the manifest from: `https://mahkooh.github.io/multicalendarsync/dist/manifest.xml`
 3. Upload this file to the admin center
 
 ### 3. Configure Deployment
@@ -50,7 +50,7 @@ Once GitHub Pages is active, test these URLs:
 If you want to test immediately without waiting for organization deployment:
 
 ### 1. Download Manifest
-- Save manifest from: `https://mahkooh.github.io/multicalendarsync/dist/manifest.json`
+- Save manifest from: `https://mahkooh.github.io/multicalendarsync/dist/manifest.xml`
 
 ### 2. Sideload in Outlook
 1. Open Outlook on the web or desktop
@@ -68,7 +68,7 @@ If you want to test immediately without waiting for organization deployment:
 ### Verification Steps
 ```bash
 # Test manifest accessibility
-curl -I https://mahkooh.github.io/multicalendarsync/dist/manifest.json
+curl -I https://mahkooh.github.io/multicalendarsync/dist/manifest.xml
 
 # Test main taskpane
 curl -I https://mahkooh.github.io/multicalendarsync/dist/taskpane.html
