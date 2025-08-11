@@ -188,7 +188,40 @@ b {
 
 .controls-section {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Date Selection */
+.date-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.date-selection label {
+    font-weight: 600;
+    color: #323130;
+}
+
+.date-picker {
+    padding: 8px 12px;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    font-size: 14px;
+    font-family: 'Segoe UI', 'Segoe UI Web (West European)', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+    background-color: #ffffff;
+    transition: border-color 0.1s ease;
+}
+
+.date-picker:focus {
+    outline: none;
+    border-color: #0078d4;
+    box-shadow: 0 0 0 1px #0078d4;
+}
+
+.date-picker:hover {
+    border-color: #323130;
 }
 
 .controls-section .ms-Button {

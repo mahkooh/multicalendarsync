@@ -14,6 +14,10 @@ Office.onReady((info) => {
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
     
+    // Set default date to August 12, 2025 for testing
+    const defaultDate = new Date('2025-08-12');
+    document.getElementById("sync-date").value = defaultDate.toISOString().split('T')[0];
+    
     // Initialize the calendar sync manager
     syncManager = new CalendarSyncManager();
     initializeApp();
@@ -79,13 +83,22 @@ function displayCalendars(calendars) {
 
 async function handleSyncNow() {
   try {
-    updateStatus('Syncing', 'Manual sync in progress...');
+    // Get the selected date
+    const selectedDate = document.getElementById("sync-date").value;
+    if (!selectedDate) {
+      updateStatus('Error', 'Please select a date to sync');
+      return;
+    }
+    
+    const syncDate = new Date(selectedDate);
+    updateStatus('Syncing', `Syncing ${syncDate.toLocaleDateString()}...`);
     updateSyncButton(true);
     
-    const result = await syncManager.performSync();
+    // Pass the selected date to the sync manager
+    const result = await syncManager.performSync(syncDate);
     
-    updateStatus('Active', `Sync completed successfully. ${result.blocksCreated} blocks created, ${result.blocksRemoved} removed.`);
-    addActivityLog(`Manual sync completed: ${result.blocksCreated} created, ${result.blocksRemoved} removed`);
+    updateStatus('Active', `Sync completed for ${syncDate.toLocaleDateString()}. ${result.blocksCreated} blocks created, ${result.blocksRemoved} removed.`);
+    addActivityLog(`Sync completed for ${syncDate.toLocaleDateString()}: ${result.blocksCreated} created, ${result.blocksRemoved} removed`);
     
   } catch (error) {
     console.error('Sync failed:', error);

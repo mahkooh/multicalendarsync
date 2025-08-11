@@ -18,8 +18,8 @@ export class CalendarSyncManager {
       syncIntervalMinutes: 15, // Auto-sync every 15 minutes
       busyBlockSubject: '[Auto-Sync] Busy',
       busyBlockCategory: 'Auto-Sync',
-      lookAheadDays: 14, // Sync events up to 14 days ahead
-      lookBehindDays: 1   // Sync events from 1 day ago
+      lookAheadDays: 0, // Sync only current day (0 days ahead)
+      lookBehindDays: 0   // Sync only current day (0 days behind)
     };
   }
 
@@ -161,7 +161,7 @@ export class CalendarSyncManager {
     return calendar.syncEnabled;
   }
 
-  async performSync() {
+  async performSync(targetDate = null) {
     if (this.syncInProgress) {
       throw new Error('Sync already in progress');
     }
@@ -169,7 +169,16 @@ export class CalendarSyncManager {
     this.syncInProgress = true;
     
     try {
-      console.log('Starting calendar synchronization...');
+      // Use target date or default to current date range
+      const syncDate = targetDate || new Date();
+      console.log(`Starting calendar synchronization for ${syncDate.toLocaleDateString()}...`);
+      
+      // Calculate date range for single day sync
+      const startDate = new Date(syncDate);
+      startDate.setHours(0, 0, 0, 0); // Start of day
+      
+      const endDate = new Date(syncDate);
+      endDate.setHours(23, 59, 59, 999); // End of day
       
       // Get all enabled calendars
       const enabledCalendars = Array.from(this.calendars.values())

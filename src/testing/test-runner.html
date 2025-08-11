@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiCalendar Sync - Functional Testing</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #0078d4, #106ebe);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #0078d4;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #106ebe;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .test-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .calendar-view {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        .calendar-header {
+            font-weight: bold;
+            color: #0078d4;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #0078d4;
+        }
+        .event-item {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 4px solid #0078d4;
+            background-color: #f8f9fa;
+        }
+        .event-private {
+            border-left-color: #6c757d;
+            background-color: #e9ecef;
+        }
+        .event-time {
+            font-weight: bold;
+            color: #495057;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            border-left: 4px solid #0078d4;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0078d4;
+        }
+        .conflict-item {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📅 MultiCalendar Sync - Functional Testing</h1>
+        <p>Test calendar synchronization with realistic data scenarios</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Scenarios</h2>
+        <div class="test-controls">
+            <button class="btn btn-primary" onclick="runScenario('Typical Business Day')">
+                📊 Typical Business Day
+            </button>
+            <button class="btn btn-primary" onclick="runScenario('Meeting Heavy Day')">
+                📅 Meeting Heavy Day
+            </button>
+            <button class="btn btn-primary" onclick="runScenario('Conflict Resolution Day')">
+                ⚠️ Conflict Resolution Day
+            </button>
+            <button class="btn btn-primary" onclick="runScenario('August 12th 2025 Real Schedule')" style="background-color: #28a745;">
+                🇦🇺 August 12th 2025 Real Schedule
+            </button>
+            <button class="btn btn-secondary" onclick="clearResults()">
+                🗑️ Clear Results
+            </button>
+            <button class="btn btn-success" onclick="runAllTests()">
+                🚀 Run All Tests
+            </button>
+        </div>
+
+        <div class="stats-grid" id="statsContainer" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="busyBlocksCount">0</div>
+                <div>Busy Blocks Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="conflictsCount">0</div>
+                <div>Conflicts Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="calendarsUpdatedCount">0</div>
+                <div>Calendars Updated</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Calendar Views</h2>
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Calendar views will be populated here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Conflicts & Issues</h2>
+        <div id="conflictsContainer">
+            <p style="color: #6c757d; font-style: italic;">No conflicts detected yet. Run a test to see results.</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Test Output Log</h2>
+        <div class="test-output" id="testOutput">Welcome to MultiCalendar Sync Testing!
+
+Click on a test scenario above to see how the calendar synchronization works.
+
+Available Tests:
+• Typical Business Day - Standard work schedule with meetings
+• Meeting Heavy Day - Busy day with overlapping calendars  
+• Conflict Resolution Day - Tests conflict detection and handling
+• August 12th 2025 Real Schedule - Your actual schedule (7am-9pm AWST)
+
+The tests will show:
+✅ Original calendar states
+✅ Sync process simulation  
+✅ Final calendar states after sync
+✅ Conflicts and busy blocks created
+        </div>
+    </div>
+
+    <script src="../testing/calendarTestGenerator.js"></script>
+    <script>
+        let testGenerator;
+        let currentResults = null;
+
+        // Initialize the test generator
+        document.addEventListener('DOMContentLoaded', function() {
+            testGenerator = new CalendarTestDataGenerator();
+            console.log('Calendar Test Generator initialized');
+        });
+
+        // Run a specific test scenario
+        async function runScenario(scenarioName) {
+            appendToLog(`\n🚀 Starting test: ${scenarioName}\n`);
+            
+            try {
+                const results = await testGenerator.testSyncScenario(scenarioName);
+                currentResults = results;
+                updateVisualResults(results, scenarioName);
+                appendToLog(`✅ Test completed successfully!\n`);
+            } catch (error) {
+                appendToLog(`❌ Test failed: ${error.message}\n`);
+                console.error('Test error:', error);
+            }
+        }
+
+        // Update the visual calendar display
+        function updateVisualResults(results, scenarioName) {
+            // Update stats
+            document.getElementById('statsContainer').style.display = 'grid';
+            document.getElementById('busyBlocksCount').textContent = results.busyBlocksCreated;
+            document.getElementById('conflictsCount').textContent = results.conflicts.length;
+            document.getElementById('calendarsUpdatedCount').textContent = results.calendarsUpdated.length;
+
+            // Update calendar grid
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            for (const [calendarId, events] of Object.entries(results.calendars)) {
+                const calendarDiv = document.createElement('div');
+                calendarDiv.className = 'calendar-view';
+                
+                let eventsHtml = '';
+                if (events.length === 0) {
+                    eventsHtml = '<div style="color: #6c757d; font-style: italic;">No events</div>';
+                } else {
+                    const sortedEvents = events.sort((a, b) => 
+                        new Date(a.start.dateTime) - new Date(b.start.dateTime)
+                    );
+                    
+                    eventsHtml = sortedEvents.map(event => {
+                        const start = new Date(event.start.dateTime);
+                        const end = new Date(event.end.dateTime);
+                        const timeStr = `${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                        const isPrivate = event.sensitivity === 'private';
+                        const icon = isPrivate ? '🔒' : '📅';
+                        
+                        return `
+                            <div class="event-item ${isPrivate ? 'event-private' : ''}">
+                                <div class="event-time">${icon} ${timeStr}</div>
+                                <div>${event.subject}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                calendarDiv.innerHTML = `
+                    <div class="calendar-header">${calendarId.toUpperCase().replace('-', ' ')}</div>
+                    ${eventsHtml}
+                `;
+
+                calendarGrid.appendChild(calendarDiv);
+            }
+
+            // Update conflicts display
+            const conflictsContainer = document.getElementById('conflictsContainer');
+            if (results.conflicts.length === 0) {
+                conflictsContainer.innerHTML = '<p style="color: #28a745; font-style: italic;">✅ No conflicts detected! All calendars synchronized successfully.</p>';
+            } else {
+                const conflictsHtml = results.conflicts.map(conflict => `
+                    <div class="conflict-item">
+                        <strong>⚠️ ${conflict.time}</strong><br>
+                        ${conflict.description}
+                    </div>
+                `).join('');
+                conflictsContainer.innerHTML = conflictsHtml;
+            }
+        }
+
+        // Run all test scenarios
+        async function runAllTests() {
+            const scenarios = ['Typical Business Day', 'Meeting Heavy Day', 'Conflict Resolution Day', 'August 12th 2025 Real Schedule'];
+            appendToLog('\n🚀 Running complete test suite...\n');
+            
+            for (const scenario of scenarios) {
+                await runScenario(scenario);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay between tests
+            }
+            
+            appendToLog('\n✅ All tests completed!\n');
+        }
+
+        // Clear all test results
+        function clearResults() {
+            document.getElementById('testOutput').textContent = 'Test output cleared. Ready for new tests.';
+            document.getElementById('calendarGrid').innerHTML = '';
+            document.getElementById('conflictsContainer').innerHTML = '<p style="color: #6c757d; font-style: italic;">No conflicts detected yet. Run a test to see results.</p>';
+            document.getElementById('statsContainer').style.display = 'none';
+            currentResults = null;
+        }
+
+        // Append text to the log output
+        function appendToLog(text) {
+            const output = document.getElementById('testOutput');
+            output.textContent += text;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Override console.log to capture test output
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            const message = args.join(' ') + '\n';
+            appendToLog(message);
+            originalConsoleLog.apply(console, args);
+        };
+    </script>
+</body>
+</html>
