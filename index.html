@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiCalendar Sync - Outlook Add-in</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #0078d4, #106ebe);
+            color: white;
+            border-radius: 10px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .card {
+            background: #f8f9fa;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #0078d4;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0078d4;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 10px 10px 0;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #106ebe;
+        }
+        .button.secondary {
+            background: #6c757d;
+        }
+        .button.secondary:hover {
+            background: #545b62;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .status {
+            padding: 15px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .note {
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MultiCalendar Sync</h1>
+        <p>Outlook Add-in for Cross-Calendar Availability Synchronization</p>
+    </div>
+
+    <div class="status">
+        <strong>✅ Deployment Ready:</strong> This add-in is configured and ready for deployment to your Microsoft 365 organization.
+    </div>
+
+    <div class="card">
+        <h2>🎯 What This Add-in Does</h2>
+        <p>MultiCalendar Sync solves the challenge of managing availability across multiple company calendars. When you have appointments in one company's calendar, this add-in ensures your busy time is reflected in all other connected calendars, so colleagues from different companies can see your accurate availability.</p>
+        
+        <h3>Key Features:</h3>
+        <ul>
+            <li><strong>Cross-Calendar Sync:</strong> Syncs busy time across up to 5 different calendars</li>
+            <li><strong>Privacy Protected:</strong> Only shows busy/free time, not appointment details</li>
+            <li><strong>Selective Control:</strong> Choose which calendars to include in synchronization</li>
+            <li><strong>Real-time Updates:</strong> Automatic sync when appointments change</li>
+            <li><strong>Clean Interface:</strong> Integrated seamlessly into Outlook</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>🚀 For Organization Administrators</h2>
+        <p>To deploy this add-in to your organization:</p>
+        
+        <a href="dist/manifest.json" class="button" download>Download Manifest File</a>
+        <a href="https://admin.microsoft.com" class="button secondary" target="_blank">Open Admin Center</a>
+        
+        <h3>Deployment Steps:</h3>
+        <ol>
+            <li>Download the manifest file using the button above</li>
+            <li>Go to Microsoft 365 Admin Center → Settings → Integrated apps</li>
+            <li>Click "Upload custom apps" → "Upload manifest file"</li>
+            <li>Upload the downloaded manifest.json file</li>
+            <li>Choose deployment scope (entire organization recommended)</li>
+            <li>Review permissions and deploy</li>
+        </ol>
+        
+        <div class="note">
+            <strong>Note:</strong> Deployment typically takes 6-24 hours to appear for all users. The add-in requires calendar read/write permissions to function properly.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🔧 For End Users</h2>
+        <p>Once deployed by your administrator, the add-in will appear in Outlook:</p>
+        
+        <h3>How to Use:</h3>
+        <ol>
+            <li>Open Outlook (desktop or web)</li>
+            <li>Look for "MultiCalendar Sync" in your add-ins</li>
+            <li>Click to open the sync panel</li>
+            <li>Select which calendars to include in synchronization</li>
+            <li>Click "Sync Now" to begin cross-calendar sync</li>
+            <li>Monitor sync status and activity in the panel</li>
+        </ol>
+        
+        <h3>Benefits:</h3>
+        <ul>
+            <li>Colleagues from different companies can see your accurate availability</li>
+            <li>Prevents double-booking across multiple business calendars</li>
+            <li>Maintains privacy by only sharing busy/free status</li>
+            <li>Automatic updates keep all calendars in sync</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>📋 Technical Details</h2>
+        <ul>
+            <li><strong>Platform:</strong> Microsoft Outlook Add-in (Web and Desktop)</li>
+            <li><strong>Permissions:</strong> Calendar read/write access</li>
+            <li><strong>Hosting:</strong> GitHub Pages (secure HTTPS)</li>
+            <li><strong>Framework:</strong> Office.js with Microsoft Graph integration</li>
+            <li><strong>Compatibility:</strong> Outlook 2016+, Outlook on the web, Outlook mobile</li>
+        </ul>
+        
+        <p><strong>Manifest URL:</strong> <code>https://mahkooh.github.io/multicalendarsync/dist/manifest.json</code></p>
+    </div>
+
+    <div class="card">
+        <h2>📞 Support</h2>
+        <p>For technical support or questions about deployment:</p>
+        <ul>
+            <li>Check the deployment documentation in the repository</li>
+            <li>Verify manifest accessibility and HTTPS connectivity</li>
+            <li>Ensure proper permissions are granted during deployment</li>
+            <li>Contact your IT administrator for organization-specific issues</li>
+        </ul>
+    </div>
+</body>
+</html>
