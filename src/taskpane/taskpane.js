@@ -10,18 +10,69 @@ import { CalendarSyncManager } from './calendarSync.js';
 let syncManager;
 
 Office.onReady((info) => {
-  if (info.host === Office.HostType.Outlook) {
-    document.getElementById("sideload-msg").style.display = "none";
-    document.getElementById("app-body").style.display = "flex";
+  try {
+    console.log('Office.onReady called with info:', info);
     
-    // Set default date to August 12, 2025 for testing
-    const defaultDate = new Date('2025-08-12');
-    document.getElementById("sync-date").value = defaultDate.toISOString().split('T')[0];
-    
-    // Initialize the calendar sync manager
-    syncManager = new CalendarSyncManager();
-    initializeApp();
+    // More permissive host check
+    if (info.host === Office.HostType.Outlook || info.host === 'Outlook' || window.Office) {
+      console.log('Host validated as Outlook');
+      document.getElementById("sideload-msg").style.display = "none";
+      document.getElementById("app-body").style.display = "flex";
+      
+      // Set default date to August 12, 2025 for testing
+      const defaultDate = new Date('2025-08-12');
+      document.getElementById("sync-date").value = defaultDate.toISOString().split('T')[0];
+      
+      // Initialize the calendar sync manager
+      syncManager = new CalendarSyncManager();
+      initializeApp();
+    } else {
+      console.error('Unsupported host application. Host info:', info);
+      // Show error but don't fail completely
+      document.getElementById("sideload-msg").innerHTML = `
+        <div style="color: red; padding: 10px;">
+          <h3>Host Detection Issue</h3>
+          <p>Detected host: ${info.host}</p>
+          <p>Expected: Outlook</p>
+          <p>Trying to continue anyway...</p>
+        </div>
+      `;
+      
+      // Try to initialize anyway
+      syncManager = new CalendarSyncManager();
+      initializeApp();
+    }
+  } catch (error) {
+    console.error('Office.onReady error:', error);
+    document.getElementById("sideload-msg").innerHTML = `
+      <div style="color: red; padding: 10px;">
+        <h3>Initialization Error</h3>
+        <p>${error.message}</p>
+        <p>Please try refreshing the page</p>
+      </div>
+    `;
   }
+});
+
+// Fallback initialization if Office.onReady doesn't work
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (!syncManager && window.Office) {
+      console.log('Fallback initialization triggered');
+      try {
+        document.getElementById("sideload-msg").style.display = "none";
+        document.getElementById("app-body").style.display = "flex";
+        
+        const defaultDate = new Date('2025-08-12');
+        document.getElementById("sync-date").value = defaultDate.toISOString().split('T')[0];
+        
+        syncManager = new CalendarSyncManager();
+        initializeApp();
+      } catch (error) {
+        console.error('Fallback initialization failed:', error);
+      }
+    }
+  }, 2000); // Wait 2 seconds for Office.js to load
 });
 
 async function initializeApp() {

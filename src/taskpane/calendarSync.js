@@ -27,6 +27,19 @@ export class CalendarSyncManager {
     try {
       console.log('Initializing Calendar Sync Manager...');
       
+      // Check if Office is available
+      if (!window.Office) {
+        throw new Error('Office.js is not loaded');
+      }
+      
+      // Check if we're in a supported context
+      if (!Office.context || !Office.context.mailbox) {
+        console.warn('Limited Office context detected, some features may not work');
+      }
+      
+      console.log('Office context available:', !!Office.context);
+      console.log('Mailbox available:', !!Office.context?.mailbox);
+      
       // Request necessary permissions
       await this.requestPermissions();
       
