@@ -131,62 +131,261 @@ export class CalendarSyncManager {
     try {
       console.log('Discovering real Microsoft accounts and calendars...');
       
-      // Use Microsoft Graph API to discover actual calendars
+      // Try to get real calendars first
       const calendars = await this.getGraphCalendars();
       
-      this.calendars.clear();
-      calendars.forEach(cal => {
-        this.calendars.set(cal.id, cal);
-      });
+      if (calendars && calendars.length > 0) {
+        this.calendars.clear();
+        calendars.forEach(cal => {
+          this.calendars.set(cal.id, cal);
+        });
 
-      console.log(`Discovered ${this.calendars.size} real calendars:`, 
-        Array.from(this.calendars.values()).map(cal => `${cal.name} (${cal.userEmail})`));
+        console.log(`✅ Discovered ${this.calendars.size} real calendars from Graph API:`);
+        Array.from(this.calendars.values()).forEach(cal => {
+          console.log(`  📅 ${cal.name} (${cal.userEmail}) - Default: ${cal.isDefaultCalendar}`);
+        });
+      } else {
+        throw new Error('No calendars returned from Graph API');
+      }
       
     } catch (error) {
-      console.error('Failed to discover calendars:', error);
-      // Fallback to mock data for testing
-      await this.discoverMockCalendars();
+      console.warn('⚠️ Graph API discovery failed, checking why:', error);
+      
+      // Try alternative approaches or fallback
+      try {
+        await this.tryAlternativeDiscovery();
+      } catch (altError) {
+        console.warn('⚠️ Alternative discovery also failed:', altError);
+        console.log('📝 Using enhanced mock data with email simulation...');
+        await this.discoverEnhancedMockCalendars();
+      }
     }
+  }
+
+  async tryAlternativeDiscovery() {
+    // Try to get user profile first to check authentication
+    const accessToken = await this.getGraphAccessToken();
+    
+    console.log('🔍 Testing Graph API access with user profile...');
+    const profileResponse = await fetch('https://graph.microsoft.com/v1.0/me', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!profileResponse.ok) {
+      throw new Error(`Profile API error: ${profileResponse.status} ${profileResponse.statusText}`);
+    }
+
+    const profile = await profileResponse.json();
+    console.log(`✅ Authenticated as: ${profile.displayName} (${profile.mail || profile.userPrincipalName})`);
+    
+    // Try calendars again with better error info
+    const calResponse = await fetch('https://graph.microsoft.com/v1.0/me/calendars', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!calResponse.ok) {
+      const errorText = await calResponse.text();
+      throw new Error(`Calendars API error: ${calResponse.status} ${calResponse.statusText} - ${errorText}`);
+    }
+
+    const calData = await calResponse.json();
+    console.log('📅 Raw calendar data from Graph:', calData);
+    
+    // Convert to our format with the authenticated user's email
+    const userEmail = profile.mail || profile.userPrincipalName;
+    const calendars = calData.value.map(graphCal => ({
+      id: graphCal.id,
+      name: graphCal.name,
+      userEmail: graphCal.owner?.emailAddress?.address || userEmail,
+      type: 'Microsoft Graph',
+      syncEnabled: true,
+      canEdit: graphCal.canEdit || false,
+      isDefaultCalendar: graphCal.isDefaultCalendar || false
+    }));
+
+    this.calendars.clear();
+    calendars.forEach(cal => {
+      this.calendars.set(cal.id, cal);
+    });
+
+    console.log(`✅ Successfully discovered ${calendars.length} calendars with emails`);
+  }
+
+  async discoverEnhancedMockCalendars() {
+    // Enhanced mock calendars with realistic email addresses
+    const mockCalendars = [
+      {
+        id: 'calendar-1',
+        name: 'Primary Work Calendar',
+        userEmail: 'dan.hookham@company1.com',
+        type: 'Exchange Online',
+        syncEnabled: true,
+        isDefaultCalendar: true
+      },
+      {
+        id: 'calendar-2', 
+        name: 'Secondary Work Calendar',
+        userEmail: 'dan.hookham@company2.com',
+        type: 'Office 365',
+        syncEnabled: true,
+        isDefaultCalendar: false
+      },
+      {
+        id: 'calendar-3',
+        name: 'Personal Calendar',
+        userEmail: 'dan.hookham@outlook.com',
+        type: 'Outlook.com',
+        syncEnabled: true,
+        isDefaultCalendar: false
+      },
+      {
+        id: 'calendar-4',
+        name: 'Project Calendar',
+        userEmail: 'dan.hookham@company3.com',
+        type: 'Exchange',
+        syncEnabled: true,
+        isDefaultCalendar: false
+      },
+      {
+        id: 'calendar-5',
+        name: 'Client Calendar',
+        userEmail: 'dan.hookham@company4.com',
+        type: 'Office 365',
+        syncEnabled: true,
+        isDefaultCalendar: false
+      }
+    ];
+
+    this.calendars.clear();
+    mockCalendars.forEach(cal => {
+      this.calendars.set(cal.id, cal);
+    });
+
+    console.log('📝 Using enhanced mock calendars with email addresses:');
+    mockCalendars.forEach(cal => {
+      console.log(`  📅 ${cal.name} (${cal.userEmail})`);
+    });
   }
 
   async getGraphCalendars() {
     try {
-      // Get access token for Microsoft Graph
       const accessToken = await this.getGraphAccessToken();
+      console.log('🔐 Graph access token obtained, fetching calendars...');
       
-      // Fetch all calendars from Microsoft Graph
-      const response = await fetch('https://graph.microsoft.com/v1.0/me/calendars', {
+      // First try to get the user's profile to understand the context
+      const profileResponse = await fetch('https://graph.microsoft.com/v1.0/me', {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         }
       });
 
-      if (!response.ok) {
-        throw new Error(`Graph API error: ${response.status} ${response.statusText}`);
+      if (!profileResponse.ok) {
+        throw new Error(`Profile API failed: ${profileResponse.status}`);
       }
 
-      const data = await response.json();
-      
-      // Convert Graph API response to our calendar format
-      return data.value.map(graphCal => ({
-        id: graphCal.id,
-        name: graphCal.name,
-        userEmail: graphCal.owner?.emailAddress?.address || 'Unknown',
-        type: 'Microsoft Graph',
-        syncEnabled: true,
-        canEdit: graphCal.canEdit || false,
-        isDefaultCalendar: graphCal.isDefaultCalendar || false
-      }));
+      const userProfile = await profileResponse.json();
+      const primaryEmail = userProfile.mail || userProfile.userPrincipalName;
+      console.log(`👤 Primary user: ${userProfile.displayName} (${primaryEmail})`);
+
+      // Get calendars with expanded properties
+      const calendarResponse = await fetch('https://graph.microsoft.com/v1.0/me/calendars?$select=id,name,canEdit,isDefaultCalendar,owner', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!calendarResponse.ok) {
+        const errorText = await calendarResponse.text();
+        console.error('Calendar API error response:', errorText);
+        throw new Error(`Calendar API failed: ${calendarResponse.status} - ${errorText}`);
+      }
+
+      const calendarData = await calendarResponse.json();
+      console.log('📊 Raw Graph calendar response:', calendarData);
+
+      if (!calendarData.value || calendarData.value.length === 0) {
+        console.warn('⚠️ No calendars found in Graph response');
+        return [];
+      }
+
+      // Try to also get calendar groups for shared/delegated calendars
+      let additionalCalendars = [];
+      try {
+        const groupResponse = await fetch('https://graph.microsoft.com/v1.0/me/calendarGroups?$expand=calendars', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (groupResponse.ok) {
+          const groupData = await groupResponse.json();
+          console.log('📂 Calendar groups found:', groupData);
+          
+          // Extract calendars from groups
+          groupData.value?.forEach(group => {
+            if (group.calendars) {
+              additionalCalendars.push(...group.calendars);
+            }
+          });
+        }
+      } catch (groupError) {
+        console.log('ℹ️ Calendar groups not accessible (normal for some accounts):', groupError.message);
+      }
+
+      // Combine and deduplicate calendars
+      const allCalendars = [...calendarData.value, ...additionalCalendars];
+      const uniqueCalendars = allCalendars.filter((cal, index, self) => 
+        index === self.findIndex(c => c.id === cal.id)
+      );
+
+      console.log(`📅 Found ${uniqueCalendars.length} total calendars (${calendarData.value.length} primary + ${additionalCalendars.length} from groups)`);
+
+      // Convert to our calendar format
+      const calendars = uniqueCalendars.map(graphCal => {
+        const ownerEmail = graphCal.owner?.emailAddress?.address || primaryEmail;
+        return {
+          id: graphCal.id,
+          name: graphCal.name || 'Unnamed Calendar',
+          userEmail: ownerEmail,
+          type: 'Microsoft Graph',
+          syncEnabled: true,
+          canEdit: graphCal.canEdit !== false, // Default to true if not specified
+          isDefaultCalendar: graphCal.isDefaultCalendar || false
+        };
+      });
+
+      console.log('✅ Processed calendars:');
+      calendars.forEach(cal => {
+        console.log(`  📅 "${cal.name}" owned by ${cal.userEmail} (Default: ${cal.isDefaultCalendar}, Editable: ${cal.canEdit})`);
+      });
+
+      return calendars;
 
     } catch (error) {
-      console.error('Failed to fetch calendars from Graph API:', error);
+      console.error('❌ getGraphCalendars failed:', error);
+      console.log('🔄 Will attempt alternative discovery or fall back to mock data');
       throw error;
     }
   }
 
   async getGraphAccessToken() {
     try {
+      console.log('🔐 Requesting Graph access token...');
+      
+      // Check if Office.js auth is available
+      if (!Office?.context?.auth?.getAccessToken) {
+        throw new Error('Office.js authentication not available in this context');
+      }
+
       // Use Office.js to get access token for Microsoft Graph
       return new Promise((resolve, reject) => {
         Office.context.auth.getAccessToken({
@@ -194,16 +393,39 @@ export class CalendarSyncManager {
           allowConsentPrompt: true,
           forMSGraphAccess: true
         }, (result) => {
+          console.log('🔍 Auth result status:', result.status);
+          
           if (result.status === Office.AsyncResultStatus.Succeeded) {
+            console.log('✅ Access token obtained successfully');
+            console.log('🎫 Token preview:', result.value.substring(0, 20) + '...');
             resolve(result.value);
           } else {
-            reject(new Error(`Authentication failed: ${result.error.message}`));
+            console.error('❌ Authentication failed:', result.error);
+            console.error('Error code:', result.error.code);
+            console.error('Error message:', result.error.message);
+            console.error('Error name:', result.error.name);
+            
+            // Provide more specific error information
+            let errorMsg = `Authentication failed: ${result.error.message}`;
+            if (result.error.code === 13001) {
+              errorMsg += ' (User not signed in - this may require signing into Office)';
+            } else if (result.error.code === 13002) {
+              errorMsg += ' (User consent required - admin may need to grant permissions)';
+            } else if (result.error.code === 13003) {
+              errorMsg += ' (Invalid audience - token scope issue)';
+            } else if (result.error.code === 13006) {
+              errorMsg += ' (Invalid request - check add-in manifest permissions)';
+            } else if (result.error.code === 13007) {
+              errorMsg += ' (Invalid grant - user may need to re-authenticate)';
+            }
+            
+            reject(new Error(errorMsg));
           }
         });
       });
     } catch (error) {
-      console.error('Failed to get Graph access token:', error);
-      throw error;
+      console.error('❌ Failed to get Graph access token:', error);
+      throw new Error(`Authentication setup failed: ${error.message}`);
     }
   }
 
