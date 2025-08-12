@@ -64,12 +64,39 @@ export class CalendarSyncManager {
 
   async requestPermissions() {
     return new Promise((resolve, reject) => {
-      // Check if we have the necessary permissions
-      if (Office.context.mailbox.diagnostics.hostName === 'Outlook') {
-        // For Outlook, we need to ensure we have calendar access
+      try {
+        // Check if we have Office context and mailbox
+        if (!Office.context || !Office.context.mailbox) {
+          console.warn('Limited Office context, proceeding with basic initialization');
+          resolve();
+          return;
+        }
+
+        // Get diagnostic info
+        const diagnostics = Office.context.mailbox.diagnostics;
+        const hostName = diagnostics?.hostName;
+        console.log('Host diagnostics:', {
+          hostName: hostName,
+          hostVersion: diagnostics?.hostVersion,
+          platform: diagnostics?.platform
+        });
+
+        // More permissive host checking
+        if (hostName === 'Outlook' || 
+            hostName === 'OutlookWebApp' || 
+            hostName === 'OutlookIOS' || 
+            hostName === 'OutlookAndroid' ||
+            !hostName) { // Allow undefined hostName as fallback
+          console.log('Host validation passed for:', hostName || 'unknown host');
+          resolve();
+        } else {
+          console.warn('Unknown host detected, proceeding anyway:', hostName);
+          resolve(); // Don't reject, just proceed
+        }
+      } catch (error) {
+        console.error('Error in requestPermissions:', error);
+        // Don't fail completely, just proceed
         resolve();
-      } else {
-        reject(new Error('Unsupported host application'));
       }
     });
   }
