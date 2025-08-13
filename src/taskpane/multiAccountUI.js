@@ -83,32 +83,90 @@ export class MultiAccountUI {
               <h4>Select Account Type:</h4>
               
               <div class="account-type-grid">
-                <div class="account-type-card" data-type="office365">
+                <div class="account-type-card demo-card">
+                  <div class="account-icon">🧪</div>
+                  <h4>Demo Mode</h4>
+                  <p>Try the interface with mock data to see how it works</p>
+                  <button class="select-type-btn demo-btn">Try Demo</button>
+                </div>
+                
+                <div class="account-type-card disabled-card" data-type="office365">
                   <div class="account-icon">🏢</div>
                   <h4>Office 365</h4>
                   <p>Business Microsoft account from another organization</p>
-                  <button class="select-type-btn">Connect</button>
+                  <div class="setup-required">
+                    <small>⚠️ Requires Azure App Registration</small>
+                  </div>
+                  <button class="select-type-btn disabled" disabled>Setup Required</button>
                 </div>
                 
-                <div class="account-type-card" data-type="gmail">
+                <div class="account-type-card disabled-card" data-type="gmail">
                   <div class="account-icon">📧</div>
                   <h4>Gmail</h4>
                   <p>Google Calendar from Gmail account</p>
-                  <button class="select-type-btn">Connect</button>
+                  <div class="setup-required">
+                    <small>⚠️ Requires Google Cloud Project</small>
+                  </div>
+                  <button class="select-type-btn disabled" disabled>Setup Required</button>
                 </div>
                 
-                <div class="account-type-card" data-type="outlook_com">
+                <div class="account-type-card disabled-card" data-type="outlook_com">
                   <div class="account-icon">📨</div>
                   <h4>Outlook.com</h4>
                   <p>Personal Microsoft account</p>
-                  <button class="select-type-btn">Connect</button>
+                  <div class="setup-required">
+                    <small>⚠️ Requires Azure App Registration</small>
+                  </div>
+                  <button class="select-type-btn disabled" disabled>Setup Required</button>
                 </div>
                 
-                <div class="account-type-card" data-type="exchange">
+                <div class="account-type-card disabled-card" data-type="exchange">
                   <div class="account-icon">🏛️</div>
                   <h4>Exchange Server</h4>
                   <p>On-premises Exchange calendar</p>
-                  <button class="select-type-btn">Connect</button>
+                  <div class="setup-required">
+                    <small>⚠️ Requires EWS Configuration</small>
+                  </div>
+                  <button class="select-type-btn disabled" disabled>Setup Required</button>
+                </div>
+              </div>
+              
+              <!-- Setup Instructions -->
+              <div class="setup-instructions">
+                <h4>🔧 Production Setup Required</h4>
+                <p>To connect real accounts, you need to set up authentication for each service:</p>
+                
+                <div class="setup-steps">
+                  <div class="setup-step">
+                    <h5>1. Office 365 / Outlook.com</h5>
+                    <ul>
+                      <li>Create Azure App Registration in each tenant</li>
+                      <li>Configure redirect URIs and permissions</li>
+                      <li>Grant admin consent for calendar access</li>
+                    </ul>
+                  </div>
+                  
+                  <div class="setup-step">
+                    <h5>2. Gmail</h5>
+                    <ul>
+                      <li>Create Google Cloud Project</li>
+                      <li>Enable Google Calendar API</li>
+                      <li>Create OAuth 2.0 credentials</li>
+                    </ul>
+                  </div>
+                  
+                  <div class="setup-step">
+                    <h5>3. Exchange Server</h5>
+                    <ul>
+                      <li>Configure Exchange Web Services (EWS)</li>
+                      <li>Set up authentication credentials</li>
+                      <li>Configure network access</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div class="demo-notice">
+                  <strong>💡 For now, use Demo Mode to see the interface in action!</strong>
                 </div>
               </div>
             </div>
@@ -211,8 +269,13 @@ export class MultiAccountUI {
     document.querySelectorAll('.select-type-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const accountType = e.target.closest('.account-type-card').dataset.type;
-        this.showAccountConfigForm(accountType);
+        
+        if (e.target.classList.contains('demo-btn')) {
+          this.handleDemoAccount();
+        } else if (!e.target.disabled) {
+          const accountType = e.target.closest('.account-type-card').dataset.type;
+          this.showAccountConfigForm(accountType);
+        }
       });
     });
 
@@ -367,14 +430,15 @@ export class MultiAccountUI {
     const accountsList = document.getElementById('accounts-list');
     if (!accountsList) return;
 
-    const accounts = this.manager.getAccountsSummary();
+    // Load accounts from localStorage for demo mode
+    const storedAccounts = JSON.parse(localStorage.getItem('calendar_accounts') || '[]');
     
-    if (accounts.length === 0) {
+    if (storedAccounts.length === 0) {
       accountsList.innerHTML = `
         <div class="no-accounts">
           <div class="no-accounts-icon">📅</div>
           <h4>No accounts connected</h4>
-          <p>Add your first calendar account to start syncing</p>
+          <p>Add your first calendar account to start syncing across multiple tenants</p>
           <button onclick="document.querySelector('[data-tab=add-account]').click()" class="btn-primary">
             Add Account
           </button>
@@ -383,7 +447,7 @@ export class MultiAccountUI {
       return;
     }
 
-    accountsList.innerHTML = accounts.map(account => `
+    accountsList.innerHTML = storedAccounts.map(account => `
       <div class="account-item ${account.isAuthenticated ? 'authenticated' : 'not-authenticated'}">
         <div class="account-info">
           <div class="account-header">
@@ -391,6 +455,7 @@ export class MultiAccountUI {
             <div class="account-details">
               <h4>${account.displayName}</h4>
               <p>${account.email}</p>
+              <small style="color: #666;">Tenant: ${account.tenantInfo?.name || 'Unknown'}</small>
             </div>
             <div class="account-status">
               ${account.isAuthenticated ? 
@@ -401,10 +466,72 @@ export class MultiAccountUI {
           </div>
           
           <div class="account-stats">
-            <span class="stat">📅 ${account.calendarCount} calendars</span>
-            <span class="stat">🔄 ${account.syncEnabled ? 'Sync enabled' : 'Sync disabled'}</span>
+            <span class="stat">📅 ${account.calendars?.length || 0} calendars</span>
+            <span class="stat">� ${account.stats?.totalEvents || 0} events</span>
+            <span class="stat">⚠️ ${account.stats?.conflicts || 0} conflicts</span>
             ${account.lastSync ? 
               `<span class="stat">⏰ Last sync: ${new Date(account.lastSync).toLocaleTimeString()}</span>` : 
+              '<span class="stat">⏰ Never synced</span>'
+            }
+          </div>
+          
+          <div class="account-actions">
+            <button class="btn-secondary sync-account-btn" data-account-id="${account.id}">
+              🔄 Sync
+            </button>
+            <button class="btn-outline remove-account-btn" data-account-id="${account.id}">
+              🗑️ Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Update summary stats
+    this.updateAccountsSummary(storedAccounts);
+  }
+
+  /**
+   * Update accounts summary display
+   */
+  updateAccountsSummary(accounts) {
+    const totalAccounts = accounts.length;
+    const authenticatedAccounts = accounts.filter(acc => acc.isAuthenticated).length;
+    const totalCalendars = accounts.reduce((sum, acc) => sum + (acc.calendars?.length || 0), 0);
+    const totalEvents = accounts.reduce((sum, acc) => sum + (acc.stats?.totalEvents || 0), 0);
+    const conflicts = accounts.reduce((sum, acc) => sum + (acc.stats?.conflicts || 0), 0);
+
+    // Update the summary display if it exists
+    const summaryEl = document.querySelector('.accounts-summary');
+    if (summaryEl) {
+      summaryEl.innerHTML = `
+        <h3>📊 Multi-Tenant Calendar Overview</h3>
+        <div class="summary-stats">
+          <div class="stat-item">
+            <span class="stat-number">${totalAccounts}</span>
+            <span class="stat-label">Connected Accounts</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">${totalCalendars}</span>
+            <span class="stat-label">Total Calendars</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">${totalEvents}</span>
+            <span class="stat-label">Total Events</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">${conflicts}</span>
+            <span class="stat-label">Conflicts</span>
+          </div>
+        </div>
+        ${totalAccounts > 0 ? `
+          <div class="sync-all-container">
+            <button class="btn-primary sync-all-btn">🔄 Sync All Accounts</button>
+          </div>
+        ` : ''}
+      `;
+    }
+  }
               '<span class="stat">⏰ Never synced</span>'
             }
           </div>
@@ -524,6 +651,96 @@ export class MultiAccountUI {
   refreshSyncStatus() {
     console.log('🔄 Refreshing sync status...');
     // This would update the sync status tab with recent activity
+  }
+
+  /**
+   * Handle demo account creation
+   */
+  async handleDemoAccount() {
+    try {
+      console.log('🧪 Creating demo account...');
+      
+      // Create a demo account with realistic data
+      const demoAccount = {
+        id: 'demo_' + Date.now(),
+        type: 'demo',
+        email: 'demo@example.com',
+        displayName: 'Demo Multi-Tenant Calendar',
+        isAuthenticated: true,
+        lastSync: new Date().toISOString(),
+        calendars: [
+          {
+            id: 'demo_cal_1',
+            name: 'Work Calendar',
+            color: '#0078d4',
+            events: 15
+          },
+          {
+            id: 'demo_cal_2', 
+            name: 'Personal Calendar',
+            color: '#8a2be2',
+            events: 8
+          }
+        ],
+        stats: {
+          totalEvents: 23,
+          upcomingEvents: 5,
+          conflicts: 2,
+          lastSyncStatus: 'success'
+        },
+        tenantInfo: {
+          name: 'Demo Organization',
+          domain: 'demo.example.com'
+        }
+      };
+
+      // Store demo account
+      const existingAccounts = JSON.parse(localStorage.getItem('calendar_accounts') || '[]');
+      existingAccounts.push(demoAccount);
+      localStorage.setItem('calendar_accounts', JSON.stringify(existingAccounts));
+      
+      // Show success message
+      this.showNotification('Demo account created successfully! Check the Overview tab to see your demo calendar data.', 'success');
+      
+      // Refresh the accounts list
+      this.refreshAccountsList();
+      
+      // Switch to overview tab to show the results
+      setTimeout(() => {
+        this.switchTab('overview');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error creating demo account:', error);
+      this.showNotification('Failed to create demo account. Please try again.', 'error');
+    }
+  }
+
+  /**
+   * Show notification message
+   */
+  showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <div class="notification-content">
+        <span class="notification-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+        <span class="notification-message">${message}</span>
+      </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Remove after delay
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => document.body.removeChild(notification), 300);
+    }, 4000);
   }
 }
 
