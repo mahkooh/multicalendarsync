@@ -137,23 +137,30 @@ localStorage.setItem('calendarSync_debug', 'true');
 
 ## Development Roadmap
 
-### Version 1.1 (Current)
-- ✅ Basic multi-calendar sync
-- ✅ Private busy block creation
-- ✅ Manual sync operations
-- ✅ Calendar enable/disable controls
+### Version 2.2.0 (Current)
+- ✅ Enhanced Graph API Diagnostics with detailed authentication troubleshooting
+- ✅ Improved Office.js context detection and error handling
+- ✅ Multi-account calendar discovery (calendar groups + shared calendars)
+- ✅ Real email address display from connected Microsoft accounts
+- ✅ Comprehensive fallback options and mock testing capabilities
+- ✅ Single-day sync precision with configurable date selection
 
-### Version 1.2 (Planned)
-- ⏳ Advanced configuration options
-- ⏳ Conflict resolution rules
-- ⏳ Performance optimizations
-- ⏳ Enhanced error handling
+### Version 2.1.0 (Completed)
+- ✅ Real Microsoft Graph API integration
+- ✅ XML manifest for proper Outlook add-in deployment
+- ✅ GitHub Pages hosting with automated deployment
 
-### Version 2.0 (Future)
+### Version 2.0.0 (Completed)
+- ✅ Complete rewrite with modern authentication
+- ✅ Office.js SSO integration
+- ✅ Enhanced mock data scenarios
+
+### Version 3.0 (Future)
 - 📋 Google Calendar integration
-- 📋 Mobile app companion
+- 📋 Mobile app companion  
 - 📋 Team calendar sharing
 - 📋 Analytics and reporting
+- 📋 Advanced conflict resolution
 
 ## Contributing
 
