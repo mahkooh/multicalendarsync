@@ -33,8 +33,13 @@
             <h2 class="ms-font-xl">Multi-Calendar Synchronization</h2>
             <p class="ms-font-m">Keep your availability consistent across all calendars</p>
             
+            <!-- Authentication Section -->
+            <div id="auth-container" class="auth-section">
+                <!-- Authentication options will be inserted here -->
+            </div>
+            
             <!-- Status Section -->
-            <div class="status-section">
+            <div class="status-section" style="display: none;" id="status-section">
                 <h3 class="ms-font-l">Sync Status</h3>
                 <div id="sync-status" class="status-indicator">
                     <span class="status-dot" id="status-dot"></span>
@@ -44,7 +49,7 @@
             </div>
 
             <!-- Calendar List -->
-            <div class="calendar-section">
+            <div class="calendar-section" style="display: none;" id="calendar-section">
                 <h3 class="ms-font-l">Connected Calendars</h3>
                 <div id="calendar-list" class="calendar-list">
                     <div class="loading">Loading calendars...</div>
@@ -76,6 +81,26 @@
             </div>
         </div>
     </main>
+
+    <!-- Templates -->
+    <script id="context-guidance-template" type="text/html">
+        <div class="context-help">
+            <h2>🔧 Setup Required</h2>
+            <p>To use this calendar sync tool, you need to:</p>
+            <ol>
+                <li><strong>Open in Outlook:</strong> This add-in works in Outlook desktop, web, or mobile</li>
+                <li><strong>Install the add-in:</strong> Deploy through Microsoft 365 Admin Center</li>
+                <li><strong>No Azure registrations needed:</strong> We'll use simplified authentication</li>
+            </ol>
+            <button onclick="window.calendarAuth.useMockMode()" class="ms-Button ms-Button--primary">
+                <span class="ms-Button-label">🧪 Try Demo Mode</span>
+            </button>
+        </div>
+    </script>
+
+    <script src="simpleAuth.js"></script>
+    <script src="calendarSync.js"></script>
+    <script src="taskpane.js"></script>
 </body>
 
 </html>
