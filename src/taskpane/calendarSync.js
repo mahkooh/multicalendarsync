@@ -381,42 +381,78 @@ export class CalendarSyncManager {
     try {
       console.log('🔐 Requesting Graph access token...');
       
+      // Check Office.js availability step by step
+      console.log('🔍 Checking Office.js availability:');
+      console.log('  - Office object:', typeof Office);
+      console.log('  - Office.context:', typeof Office?.context);
+      console.log('  - Office.context.auth:', typeof Office?.context?.auth);
+      console.log('  - getAccessToken method:', typeof Office?.context?.auth?.getAccessToken);
+      
+      // Check if we're in the right host application
+      if (Office?.context?.host) {
+        console.log('🏢 Host application:', Office.context.host);
+        console.log('📱 Platform:', Office.context.platform);
+        console.log('🔧 Requirements:', Office.context.requirements);
+      }
+
       // Check if Office.js auth is available
       if (!Office?.context?.auth?.getAccessToken) {
+        console.warn('⚠️ Office.js authentication not available in this context');
+        console.log('🔄 Attempting alternative authentication methods...');
+        
+        // Try to check if we're in a web context that supports alternative auth
+        if (typeof window !== 'undefined' && window.location) {
+          console.log('🌐 Running in web context:', window.location.href);
+          
+          // For testing purposes, try to simulate a token or provide guidance
+          throw new Error('Office.js SSO not available - add-in may need to be loaded in proper Office context');
+        }
+        
         throw new Error('Office.js authentication not available in this context');
       }
 
+      console.log('✅ Office.js authentication is available, requesting token...');
+
       // Use Office.js to get access token for Microsoft Graph
       return new Promise((resolve, reject) => {
-        Office.context.auth.getAccessToken({
+        const tokenOptions = {
           allowSignInPrompt: true,
           allowConsentPrompt: true,
           forMSGraphAccess: true
-        }, (result) => {
+        };
+        
+        console.log('📋 Token request options:', tokenOptions);
+
+        Office.context.auth.getAccessToken(tokenOptions, (result) => {
           console.log('🔍 Auth result status:', result.status);
+          console.log('🔍 Full auth result:', result);
           
           if (result.status === Office.AsyncResultStatus.Succeeded) {
             console.log('✅ Access token obtained successfully');
             console.log('🎫 Token preview:', result.value.substring(0, 20) + '...');
+            console.log('🎫 Token length:', result.value.length);
             resolve(result.value);
           } else {
             console.error('❌ Authentication failed:', result.error);
-            console.error('Error code:', result.error.code);
-            console.error('Error message:', result.error.message);
-            console.error('Error name:', result.error.name);
+            console.error('Error code:', result.error?.code);
+            console.error('Error message:', result.error?.message);
+            console.error('Error name:', result.error?.name);
+            console.error('Error tracing:', result.error?.tracing);
             
             // Provide more specific error information
-            let errorMsg = `Authentication failed: ${result.error.message}`;
-            if (result.error.code === 13001) {
+            let errorMsg = `Authentication failed: ${result.error?.message || 'Unknown error'}`;
+            if (result.error?.code === 13001) {
               errorMsg += ' (User not signed in - this may require signing into Office)';
-            } else if (result.error.code === 13002) {
+            } else if (result.error?.code === 13002) {
               errorMsg += ' (User consent required - admin may need to grant permissions)';
-            } else if (result.error.code === 13003) {
+            } else if (result.error?.code === 13003) {
               errorMsg += ' (Invalid audience - token scope issue)';
-            } else if (result.error.code === 13006) {
+            } else if (result.error?.code === 13006) {
               errorMsg += ' (Invalid request - check add-in manifest permissions)';
-            } else if (result.error.code === 13007) {
+            } else if (result.error?.code === 13007) {
               errorMsg += ' (Invalid grant - user may need to re-authenticate)';
+            } else if (result.error?.code === 13012) {
+              errorMsg += ' (Add-in not trusted - may need admin consent)';
             }
             
             reject(new Error(errorMsg));
@@ -425,6 +461,11 @@ export class CalendarSyncManager {
       });
     } catch (error) {
       console.error('❌ Failed to get Graph access token:', error);
+      console.log('💡 Troubleshooting suggestions:');
+      console.log('  1. Ensure add-in is loaded in Outlook (not just web browser)');
+      console.log('  2. Check that manifest is properly deployed');
+      console.log('  3. Verify Office.js is fully loaded');
+      console.log('  4. Check manifest WebApplicationInfo configuration');
       throw new Error(`Authentication setup failed: ${error.message}`);
     }
   }
