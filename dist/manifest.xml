@@ -6,7 +6,7 @@
            xsi:type="MailApp">
   
   <Id>b3c4b5a0-2b3e-4c5d-8f9e-1a2b3c4d5e6f</Id>
-  <Version>2.3.1.0</Version>
+  <Version>2.3.2.0</Version>
   <ProviderName>Dan Hookham</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   
@@ -40,7 +40,7 @@
     </Form>
   </FormSettings>
   
-  <Permissions>ReadWriteMailbox</Permissions>
+  <Permissions>ReadWriteItem</Permissions>
   
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
