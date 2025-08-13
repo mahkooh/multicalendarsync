@@ -1,0 +1,607 @@
+/* Multi-Account Calendar Manager Styles */
+
+.multi-account-manager {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header */
+.account-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.account-header h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.account-header p {
+  color: #666;
+  margin: 0;
+}
+
+/* Tabs */
+.account-tabs {
+  display: flex;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 30px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #2c3e50;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tab-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.5);
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Accounts List */
+.accounts-summary {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  margin-bottom: 24px;
+}
+
+.accounts-summary h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.accounts-list {
+  margin-bottom: 24px;
+}
+
+.account-item {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.account-item.authenticated {
+  border-color: #28a745;
+  background: #f8fff9;
+}
+
+.account-item.not-authenticated {
+  border-color: #dc3545;
+  background: #fff8f8;
+}
+
+.account-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.account-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.account-type-icon {
+  font-size: 24px;
+  margin-right: 12px;
+}
+
+.account-details {
+  flex: 1;
+}
+
+.account-details h4 {
+  margin: 0 0 4px 0;
+  color: #2c3e50;
+  font-size: 1.1em;
+}
+
+.account-details p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.account-status {
+  text-align: right;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.status-badge.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.account-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  font-size: 0.85em;
+  color: #666;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.account-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* No Accounts State */
+.no-accounts {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.no-accounts-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.no-accounts h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.no-accounts p {
+  margin: 0 0 20px 0;
+}
+
+/* Buttons */
+.btn-primary {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+}
+
+.btn-small {
+  background: #e9ecef;
+  color: #495057;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition: all 0.2s ease;
+}
+
+.btn-small:hover {
+  background: #dee2e6;
+}
+
+.btn-small.danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.btn-small.danger:hover {
+  background: #f5c6cb;
+}
+
+/* Sync Actions */
+.sync-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Add Account Form */
+.add-account-form {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.add-account-form h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  margin-bottom: 24px;
+}
+
+.account-type-selection h4 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.account-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.account-type-card {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.account-type-card:hover {
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,123,255,0.1);
+}
+
+.account-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.account-type-card h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.account-type-card p {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.select-type-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.select-type-btn:hover {
+  background: #0056b3;
+}
+
+/* Account Configuration Form */
+.account-config-form {
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.account-config-form h4 {
+  margin-top: 0;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 4px;
+  color: #6c757d;
+  font-size: 0.8em;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Sync Overview */
+.sync-overview {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.sync-overview h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.sync-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sync-settings label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #495057;
+}
+
+.sync-settings select {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+/* Sync Status */
+.sync-status-view {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.sync-timeline {
+  margin-bottom: 32px;
+}
+
+.sync-timeline h4 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.timeline-list {
+  border-left: 2px solid #e9ecef;
+  padding-left: 0;
+}
+
+.timeline-item {
+  display: flex;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  background: #007bff;
+  border-radius: 50%;
+}
+
+.timeline-time {
+  width: 80px;
+  flex-shrink: 0;
+  color: #6c757d;
+  font-size: 0.85em;
+  margin-left: 16px;
+}
+
+.timeline-content {
+  flex: 1;
+  margin-left: 16px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.sync-conflicts h4 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.no-conflicts {
+  color: #28a745;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Message Display */
+.message-display {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.message-display.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message-display.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.message-display.info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .multi-account-manager {
+    padding: 12px;
+  }
+  
+  .account-tabs {
+    flex-direction: column;
+  }
+  
+  .account-type-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .account-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .account-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .account-actions {
+    justify-content: center;
+  }
+  
+  .sync-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .timeline-item {
+    flex-direction: column;
+  }
+  
+  .timeline-time {
+    width: auto;
+    margin-left: 16px;
+    margin-bottom: 4px;
+  }
+}
+
+/* Loading States */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.account-item {
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+  animation: fadeIn 0.2s ease;
+}
+
+/* Focus States */
+button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
