@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
     "id": "880d5f6d-d20c-4ef9-a76f-b02a93c63202",
     "manifestVersion": "1.17",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "name": {
         "short": "MultiCalendar",
         "full": "MultiCalendar Sync - Calendar Synchronization Add-in"
